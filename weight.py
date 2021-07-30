@@ -29,7 +29,7 @@ def smooth(data, cutoff_freq=0.03):
       padlen = 3 * max(len(A), len(B))
    else:
       padlen = 0
-   return signal.filtfilt(B, A, data, padlen=padlen)
+   return signal.filtfilt(B, A, data, padtype='constant', padlen=padlen)
 
 def plot():
    import numpy as np
