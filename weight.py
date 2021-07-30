@@ -66,8 +66,11 @@ def plot():
    ymin, ymax = np.floor(data.min()), np.ceil(data.max())
    major_ymin = np.floor(data.min()/5)*5
    major_ymax = np.ceil(data.max()/5)*5
-   ax.set_yticks(np.arange(major_ymin, major_ymax+1, 5))
-   ax.set_yticks(np.arange(ymin, ymax+1), minor=True)
+   if ymax - ymin > 15:
+      ax.set_yticks(np.arange(major_ymin, major_ymax+1, 5))
+      ax.set_yticks(np.arange(ymin, ymax+1), minor=True)
+   else:
+      ax.set_yticks(np.arange(ymin, ymax+1))
 
    step = max(1, len(data) // 12)
    ax.set_xticks(np.arange(0, len(data), step))
