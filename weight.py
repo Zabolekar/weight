@@ -1,16 +1,26 @@
-from os import path
-from sys import argv
-import datetime as dt
-DATE_FORMAT = "%d.%m.%Y"
-DATA = path.join(path.dirname(path.abspath(__file__)), "weight.dat")
-
-def fail(message):
-   quit(message + """
+"""
 Example usage:
 weight cat
 weight plot
 weight add 75.2
-""")
+"""
+
+from os import path
+from sys import argv
+import datetime as dt
+DATE_FORMAT = "%d.%m.%Y"
+NAME = "weight.dat"
+DATA = path.join(path.dirname(path.abspath(__file__)), NAME)
+if not path.exists(DATA):
+    print(f"Warning: {NAME} does not exist, creating empty file")
+    with open(DATA, 'w') as f:
+        pass
+
+def wrong_usage(message):
+   quit(message + __doc__)
+
+def wrong_data(message):
+    quit(message)
 
 def read():
    dates, weights = [], []
@@ -37,8 +47,9 @@ def plot():
 
    dates, weights = read()
    data = np.array(weights)
-   if len(data) < 2:
-      raise ValueError("at least 2 data points required for plotting")
+   n = len(data)
+   if n < 2:
+      wrong_data(f"At least 2 data points required for plotting, got {n}")
 
    fig = plt.figure(figsize=(13, 7))
    ax = fig.add_subplot(1, 1, 1)
@@ -89,7 +100,7 @@ def add(weight):
    try:
       float(weight)
    except ValueError:
-      fail(f"Cant convert {weight} to float")
+      wrong_data(f"Cant convert {weight} to float")
 
    date = dt.date.today().strftime(DATE_FORMAT)
    with open(DATA, "a") as f:
@@ -100,16 +111,16 @@ if __name__ == "__main__":
    try:
       _, command, *rest = argv
    except ValueError:
-      fail("")
+      wrong_usage("")
    if command == "plot":
       if rest:
-         fail("Plot doesn't take arguments.")
+         wrong_usage("Plot doesn't take arguments.")
       plot()
    elif command == "add":
       try:
          [weight] = rest
       except ValueError:
-         fail("Add needs exactly one argument.")
+         wrong_usage("Add needs exactly one argument.")
       add(weight)
    elif command == "cat":
       print("...")
@@ -117,4 +128,4 @@ if __name__ == "__main__":
       for weight in weights[-30:]:
          print(weight)
    else:
-      fail(f"Unknown command: {command}")
+      wrong_usage(f"Unknown command: {command}")
